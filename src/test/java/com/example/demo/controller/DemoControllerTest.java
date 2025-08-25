@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -30,4 +31,51 @@ class DemoControllerTest {
     private MockMvc mockMvc;
 
     // add your test cases here
+
+    @Test
+    void testNormalWord() throws Exception {
+        mockMvc.perform(get("/remove").param("input", "eloquent"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("loquen"));
+    }
+
+    @Test
+    void testTwoCharacters() throws Exception {
+        mockMvc.perform(get("/remove").param("input", "ab"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(""));
+    }
+
+    @Test
+    void testSingleCharacter() throws Exception {
+        mockMvc.perform(get("/remove").param("input", "x"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testEmptyString() throws Exception {
+        mockMvc.perform(get("/remove").param("input", ""))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testWhitespaceString() throws Exception {
+        mockMvc.perform(get("/remove").param("input", "   "))
+                .andExpect(status().isOk())
+                .andExpect(content().string(" "));
+    }
+
+    @Test
+    void testNumbersOnly() throws Exception {
+        mockMvc.perform(get("/remove").param("input", "12345"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("234"));
+    }
+
+    @Test
+    void testSpecialCharacters() throws Exception {
+        mockMvc.perform(get("/remove").param("input", "!@#$$#@!"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("@#$$#@"));
+    }
 }
